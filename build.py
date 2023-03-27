@@ -70,6 +70,9 @@ if __name__ == "__main__":
 
     logging.root.info("Configuring build")
     if args.target.startswith("android"):
+        # doesn't build correctly when LD=llvm-ld
+        del env["LD"]
+
         env["LIBS"] = f"-L{args.install_prefix}/lib"
         env["INCLUDES"] = f"-I{args.install_prefix}/include"
         builder.execute(
