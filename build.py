@@ -42,13 +42,19 @@ if __name__ == "__main__":
     builder.make_dirs(args)
     builder.setup_logger(args)
 
-    builder.install_packages(args, [
-        "automake=1:1.16.1*",
-        "libtool=2.4.6*",
-    ])
-    builder.install_ext(args, [
-        ("gf-complete", args.gf_complete_version),
-    ])
+    builder.install_packages(
+        args,
+        [
+            "automake=1:1.16.1*",
+            "libtool=2.4.6*",
+        ],
+    )
+    builder.install_ext(
+        args,
+        [
+            ("gf-complete", args.gf_complete_version),
+        ],
+    )
 
     # This commit is the latest on the master branch as of 2015-01-08
     ref = "414c96ef2b9934953b6facb31d803d79b1dd1405"
@@ -66,43 +72,65 @@ if __name__ == "__main__":
     if args.target.startswith("android"):
         env["LIBS"] = f"-L{args.install_prefix}/lib"
         env["INCLUDES"] = f"-I{args.install_prefix}/include"
-        builder.execute(args, [
-            "autoreconf",
-            "--install",
-        ], cwd=source_dir, env=env)
+        builder.execute(
+            args,
+            [
+                "autoreconf",
+                "--install",
+            ],
+            cwd=source_dir,
+            env=env,
+        )
 
-        target = "x86_64-linux-android" if "x86" in args.target else "aarch64-linux-android"
-        builder.execute(args, [
-            "./configure",
-            f"--prefix=/",
-            f"--host={target}",
-            f"--target={target}"
-        ], cwd=source_dir, env=env)
+        target = (
+            "x86_64-linux-android" if "x86" in args.target else "aarch64-linux-android"
+        )
+        builder.execute(
+            args,
+            ["./configure", f"--prefix=/", f"--host={target}", f"--target={target}"],
+            cwd=source_dir,
+            env=env,
+        )
 
     else:
-        builder.execute(args, [
-            "autoreconf",
-            "--install",
-        ], cwd=source_dir, env=env)
+        builder.execute(
+            args,
+            [
+                "autoreconf",
+                "--install",
+            ],
+            cwd=source_dir,
+            env=env,
+        )
 
         target = "x86_64-linux-gnu" if "x86" in args.target else "aarch64-linux-gnu"
-        builder.execute(args, [
-            "./configure",
-            f"--prefix=/",
-            f"--host={target}",
-            f"--target={target}"
-        ], cwd=source_dir, env=env)
+        builder.execute(
+            args,
+            ["./configure", f"--prefix=/", f"--host={target}", f"--target={target}"],
+            cwd=source_dir,
+            env=env,
+        )
 
     logging.root.info("Building")
-    builder.execute(args, [
-        "make",
-        "-j",
-        args.num_threads,
-    ], cwd=source_dir, env=env)
-    builder.execute(args, [
-        "make",
-        f"DESTDIR={args.install_dir}",
-        "install",
-    ], cwd=source_dir, env=env)
+    builder.execute(
+        args,
+        [
+            "make",
+            "-j",
+            args.num_threads,
+        ],
+        cwd=source_dir,
+        env=env,
+    )
+    builder.execute(
+        args,
+        [
+            "make",
+            f"DESTDIR={args.install_dir}",
+            "install",
+        ],
+        cwd=source_dir,
+        env=env,
+    )
 
     builder.create_package(args)
